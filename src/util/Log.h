@@ -43,8 +43,30 @@ private:
 
     static FILE* GetOutStream();
     static FILE* GetErrStream();
+    static void PrintTimestamp(FILE* stream);
+
 
 private:
     static FILE* _outStream;
     static FILE* _errStream;
+
+void Log::PrintTimestamp(FILE* stream) {
+    std::time_t now = std::time(nullptr);
+    char timestamp[20];
+    std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+    fprintf(stream, "[%s] ", timestamp);
+}
+
+void Log::Line(const char* msg, ...) {
+    va_list args;
+    va_start(args, msg);
+
+    FILE* stream = GetOutStream();
+    PrintTimestamp(stream);
+    vfprintf(stream, msg, args);
+    fprintf(stream, "\n");
+
+    va_end(args);
+}
+
 };
